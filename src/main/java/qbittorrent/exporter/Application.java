@@ -23,9 +23,12 @@ public class Application {
     private static final String PROTOCOL_ENVIRONMENT = "QBITTORRENT_PROTOCOL";
     private static final String PROTOCOL_DEFAULT = "http";
     private static final String BASE_URL_ENVIRONMENT = "QBITTORRENT_BASE_URL";
-    private static final String METRICS_HOST = "0.0.0.0";
-    private static final String METRICS_PATH = "/metrics";
-    private static final int METRICS_PORT = 17871;
+    private static final String METRICS_HOST_ENVIRONMENT = "METRICS_HOST";
+    private static final String METRICS_HOST_DEFAULT = "0.0.0.0";
+    private static final String METRICS_PATH_ENVIRONMENT = "METRICS_PATH";
+    private static final String METRICS_PATH_DEFAULT = "/metrics";
+    private static final String METRICS_PORT_ENVIRONMENT = "METRICS_PORT";
+    private static final int METRICS_PORT_DEFAULT = 17871;
 
     public static void main(String[] args) {
         final String username = getEnvironment(USERNAME_ENVIRONMENT, USERNAME_DEFAULT);
@@ -34,6 +37,9 @@ public class Application {
         final String port = getEnvironment(PORT_ENVIRONMENT, PORT_DEFAULT);
         final String protocol = getEnvironment(PROTOCOL_ENVIRONMENT, PROTOCOL_DEFAULT);
         final String baseUrl = getEnvironment(BASE_URL_ENVIRONMENT, String.format("%s://%s:%s", protocol, host, port));
+        final String METRICS_HOST = getEnvironment(METRICS_HOST_ENVIRONMENT, METRICS_HOST_DEFAULT);
+        final String METRICS_PATH = getEnvironment(METRICS_PATH_ENVIRONMENT, METRICS_PATH_DEFAULT);
+        final int METRICS_PORT = Integer.parseInt(getEnvironment(METRICS_PORT_ENVIRONMENT, String.valueOf(METRICS_PORT_DEFAULT)));
 
         final ApiClient client = new ApiClient(baseUrl, username, password);
         try {
