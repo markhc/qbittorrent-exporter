@@ -35,6 +35,8 @@ public interface QbtMetrics {
 
     void setTorrentStates(String name, long value);
 
+    void setTorrentTrackers(String name, long value);
+
     void setTorrentSeeders(String name, long value);
 
     void setTorrentLeechers(String name, long value);

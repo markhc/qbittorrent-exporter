@@ -84,6 +84,12 @@ public class QbtHttpHandler implements HttpHandler {
                 collector.setTorrentStates(state, count);
             }
 
+            final List<String> trackers = torrents.stream().map(Torrent::getTracker).distinct().toList();
+            for (String tracker : trackers) {
+                final long count = torrents.stream().filter(t -> t.getTracker().equals(tracker)).count();
+                collector.setTorrentTrackers(tracker, count);
+            }
+
             final long duration = (System.nanoTime() - start) / 1_000_000;
             LOGGER.info("Completed in {}ms", duration);
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, CONTENT_TYPE);

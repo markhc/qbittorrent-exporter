@@ -99,6 +99,12 @@ public class QbtCollector extends Collector implements QbtMetrics {
         .help("The current state of torrents")
         .create();
 
+    private final Gauge torrentTrackers = Gauge.build()
+        .name(GAUGE_NAME_PREFIX + "torrent_trackers")
+        .labelNames("name")
+        .help("The trackers for each torrent")
+        .create();
+
     private final Gauge torrentSeeders = Gauge.build()
         .name(GAUGE_NAME_PREFIX + "torrent_seeders")
         .labelNames("name")
@@ -133,6 +139,7 @@ public class QbtCollector extends Collector implements QbtMetrics {
         .name(GAUGE_NAME_PREFIX + "torrent_info")
         .labelNames(
             "name",
+            "tracker",
             "state",
             "size",
             "progress",
@@ -232,6 +239,7 @@ public class QbtCollector extends Collector implements QbtMetrics {
             torrentProgress,
             torrentTimeActive,
             torrentStates,
+            torrentTrackers,
             torrentSeeders,
             torrentLeechers,
             torrentRatio,
@@ -315,6 +323,11 @@ public class QbtCollector extends Collector implements QbtMetrics {
     }
 
     @Override
+    public void setTorrentTrackers(String name, long value) {
+        torrentTrackers.labels(name).set(value);
+    }
+
+    @Override
     public void setTorrentSeeders(String name, long value) {
         torrentSeeders.labels(name).set(value);
     }
@@ -343,6 +356,7 @@ public class QbtCollector extends Collector implements QbtMetrics {
     public void setTorrentInfo(Torrent torrent) {
         torrentInfo.labels(
             torrent.getName(),
+            torrent.getTracker(),
             torrent.getState(),
             String.valueOf(torrent.getSize()),
             String.valueOf(torrent.getProgress()),
