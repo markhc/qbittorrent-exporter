@@ -75,6 +75,18 @@ public class QbtCollector extends Collector implements QbtMetrics {
         .help("The current upload speed of torrents (in bytes)")
         .create();
 
+    private final Gauge torrentDownloadSpeedBytesByTracker = Gauge.build()
+        .name(GAUGE_NAME_PREFIX + "torrent_download_speed_bytes_by_tracker")
+        .labelNames("name", "tracker")
+        .help("The current download speed of torrents by tracker (in bytes)")
+        .create();
+
+    private final Gauge torrentUploadSpeedBytesByTracker = Gauge.build()
+        .name(GAUGE_NAME_PREFIX + "torrent_upload_speed_bytes_by_tracker")
+        .labelNames("name", "tracker")
+        .help("The current upload speed of torrents by tracker (in bytes)")
+        .create();
+
     private final Gauge torrentEta = Gauge.build()
         .name(GAUGE_NAME_PREFIX + "torrent_eta")
         .labelNames("name")
@@ -235,6 +247,8 @@ public class QbtCollector extends Collector implements QbtMetrics {
             appVersion,
             torrentDownloadSpeedBytes,
             torrentUploadSpeedBytes,
+            torrentDownloadSpeedBytesByTracker,
+            torrentUploadSpeedBytesByTracker,
             torrentEta,
             torrentProgress,
             torrentTimeActive,
@@ -300,6 +314,16 @@ public class QbtCollector extends Collector implements QbtMetrics {
     @Override
     public void setTorrentUploadSpeedBytes(String name, double value) {
         torrentUploadSpeedBytes.labels(name).set(value);
+    }
+
+    @Override
+    public void setTorrentDownloadSpeedBytesByTracker(String name, String tracker, double value) {
+        torrentDownloadSpeedBytesByTracker.labels(name, tracker).set(value);
+    }
+
+    @Override
+    public void setTorrentUploadSpeedBytesByTracker(String name, String tracker, double value) {
+        torrentUploadSpeedBytesByTracker.labels(name, tracker).set(value);
     }
 
     @Override

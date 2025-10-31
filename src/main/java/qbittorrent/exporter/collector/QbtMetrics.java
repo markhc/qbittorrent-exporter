@@ -27,6 +27,10 @@ public interface QbtMetrics {
 
     void setTorrentUploadSpeedBytes(String name, double value);
 
+    void setTorrentDownloadSpeedBytesByTracker(String name, String tracker, double value);
+
+    void setTorrentUploadSpeedBytesByTracker(String name, String tracker, double value);
+
     void setTorrentEta(String name, double value);
 
     void setTorrentProgress(String name, double value);
