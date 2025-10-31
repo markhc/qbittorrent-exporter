@@ -1,5 +1,5 @@
 # Build stage
-FROM openjdk:17 AS builder
+FROM eclipse-temurin:21 AS builder
 
 # Set working directory
 WORKDIR /app
@@ -16,7 +16,7 @@ COPY src/ src/
 RUN chmod +x gradlew && ./gradlew installDist --no-daemon
 
 # Runtime stage
-FROM openjdk:17-jre-slim
+FROM eclipse-temurin:21-jre
 
 # Copy the built application from builder stage
 COPY --from=builder /app/build/install/qbittorrent-exporter /opt/qbittorrent-exporter
