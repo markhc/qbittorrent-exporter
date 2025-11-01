@@ -27,12 +27,36 @@ logging:
   debug: false
 
 # Tracker name mappings
+# Supports four types of matching (in order of priority):
+# 1. Exact match: "tracker.beyond-hd.me: BHD"
+# 2. Regex patterns: ".*beyond-hd.*: BHD" 
+# 3. Substring match: "beyond-hd: BHD" (matches tracker.beyond-hd.me, beyond-hd.me, etc.)
+# 4. Special "other" key: Fallback for any unmatched trackers
 trackers:
-  blutopia.cc: BLU
-  beyond-hd.me: BHD
-  tracker.beyond-hd.me: BHD
-  passthepopcorn.me: PTP
-  broadcasthe.net: BTN
-  redacted.ch: RED
-  orpheus.network: OPS
-  animebytes.tv: AB
+  aither: Aither
+  animebytes.tv: animebytes
+  anthelion: Anthelion
+  avistaz: avistaz
+  bakabt: bakabt
+  beyond-hd: beyondhd
+  blutopia: blutopia
+  cathode-ray: CRT
+  digitalcore: DigitalCore
+  filelist: FL
+  gazellegames: GGn
+  hdbits: HDB
+  hdts: HDTorrents
+  landof.tv: BroadcasTheNet
+  myanonamouse: MaM
+  morethantv: MTV
+  nyaa: Nyaa
+  oldtoons: OldToons
+  passthepopcorn: PassThePopcorn
+  privatehd: PrivateHD
+  seedpool: seedpool
+  flacsfor: RED
+  opsfet: OPS
+  torrentleech|tleechreload: TorrentLeech
+  tv-vault: TV-Vault
+  hawke: HUNO
+  other: other

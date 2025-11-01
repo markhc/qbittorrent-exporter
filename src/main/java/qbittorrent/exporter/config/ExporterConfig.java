@@ -214,12 +214,7 @@ public class ExporterConfig {
      */
     private void loadDefaultConfiguration(Map<String, Object> config) {
         // Default tracker mappings
-        Map<String, String> defaultTrackers = new HashMap<>();
-        defaultTrackers.put("tracker.openbittorrent.com", "OpenBT");
-        defaultTrackers.put("thepiratebay.org", "TPB");
-        defaultTrackers.put("1337x.to", "1337x");
-        defaultTrackers.put("nyaa.si", "Nyaa");
-        defaultTrackers.put("rarbg.to", "RARBG");
+        Map<String, String> defaultTrackers = new HashMap<>();         // fallback for any unmatched trackers
         config.put("trackers", defaultTrackers);
         
         // Default cache settings

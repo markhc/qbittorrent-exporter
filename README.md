@@ -102,12 +102,53 @@ metrics:
   collect_torrent_info: true  # Collect expensive torrent_info metric
 
 # Tracker name mappings
+# Supports exact match, regex patterns, and substring matching
 trackers:
+  # Exact matches
   blutopia.cc: BLU
-  beyond-hd.me: BHD
   passthepopcorn.me: PTP
-  redacted.ch: RED
+  
+  # Substring patterns (matches subdomains)
+  beyond-hd: BHD                    # matches tracker.beyond-hd.me
+  torrentleech: TL                  # matches tracker.torrentleech.org
+  
+  # Regex patterns
+  ".*\\.thepiratebay\\..*": TPB     # matches any thepiratebay subdomain
+  ".*1337x.*": 1337x                # matches any domain containing 1337x
 ```
+
+#### Tracker Matching Types
+
+The tracker mapping supports four types of pattern matching (in order of priority):
+
+1. **Exact Match** (highest priority, best performance):
+   ```yaml
+   tracker.beyond-hd.me: BHD
+   ```
+
+2. **Regex Patterns** (most flexible):
+   ```yaml
+   ".*\\.beyond-hd\\..*": BHD        # matches any beyond-hd subdomain
+   "^tracker\\..*": TRACKER          # matches any tracker.* domain
+   torrentleech|tleechreload: TL     # matches either pattern
+   ```
+
+3. **Substring Match** (convenient for subdomains):
+   ```yaml
+   beyond-hd: BHD                    # matches tracker.beyond-hd.me, beyond-hd.me, etc.
+   torrentleech: TL                  # matches tracker.torrentleech.org, www.torrentleech.org
+   ```
+
+4. **Special "other" Fallback** (lowest priority):
+   ```yaml
+   other: Unknown                    # fallback for any unmatched trackers
+   ```
+
+**Examples:**
+- `beyond-hd` matches: `tracker.beyond-hd.me`, `beyond-hd.me`, `www.beyond-hd.me`
+- `".*\\.1337x\\..*"` matches: `www.1337x.to`, `tracker.1337x.to`
+- `torrentleech|tleechreload` matches: `tracker.torrentleech.org`, `tleechreload.com`
+- `other: Unknown` catches: any tracker not matched by other patterns
 
 ### System Properties & Environment Variables
 
