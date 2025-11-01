@@ -378,9 +378,14 @@ public class QbtCollector extends Collector implements QbtMetrics {
 
     @Override
     public void setTorrentInfo(Torrent torrent) {
+        setTorrentInfo(torrent, torrent.getTracker());
+    }
+
+    @Override
+    public void setTorrentInfo(Torrent torrent, String mappedTracker) {
         torrentInfo.labels(
             torrent.getName(),
-            torrent.getTracker(),
+            mappedTracker,
             torrent.getState(),
             String.valueOf(torrent.getSize()),
             String.valueOf(torrent.getProgress()),

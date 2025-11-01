@@ -53,6 +53,8 @@ public interface QbtMetrics {
 
     void setTorrentInfo(Torrent torrent);
 
+    void setTorrentInfo(Torrent torrent, String mappedTracker);
+
     void setTorrentSessionDownloadedBytes(String name, double value);
 
     void setTorrentSessionUploadedBytes(String name, double value);

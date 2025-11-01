@@ -13,6 +13,8 @@ import qbittorrent.api.model.Preferences;
 import qbittorrent.api.model.ServerState;
 import qbittorrent.api.model.Torrent;
 import qbittorrent.exporter.collector.QbtCollector;
+import qbittorrent.exporter.config.TrackerMapper;
+import qbittorrent.exporter.config.ExporterConfig;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -21,13 +23,12 @@ public class QbtHttpHandler implements HttpHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QbtHttpHandler.class);
     private static final String CONTENT_TYPE = "text/plain;charset=utf-8";
-    private static final long CACHE_DURATION_MS = 5000;
-    private static final boolean COLLECT_TORRENT_INFO = Boolean.parseBoolean(
-        System.getProperty("qbt.collect.torrent.info", "true"));
-
+    
     private final PrometheusMeterRegistry registry;
     private final QbtCollector collector;
     private final ApiClient client;
+    private final TrackerMapper trackerMapper;
+    private final ExporterConfig config;
     
     // Caching fields
     private volatile long lastUpdateTime = 0;
@@ -35,8 +36,10 @@ public class QbtHttpHandler implements HttpHandler {
 
     public QbtHttpHandler(final ApiClient client) {
         this.client = client;
+        this.config = ExporterConfig.getInstance();
         this.registry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
         this.collector = new QbtCollector();
+        this.trackerMapper = new TrackerMapper();
         this.registry.getPrometheusRegistry().register(collector);
     }
 
@@ -45,7 +48,8 @@ public class QbtHttpHandler implements HttpHandler {
         try {
             // Check cache first
             final long currentTime = System.currentTimeMillis();
-            if (cachedMetrics != null && (currentTime - lastUpdateTime) < CACHE_DURATION_MS) {
+            final long cacheDuration = config.getCacheDurationMs();
+            if (cachedMetrics != null && (currentTime - lastUpdateTime) < cacheDuration) {
                 LOGGER.debug("Serving cached metrics ({}ms old)", currentTime - lastUpdateTime);
                 exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, CONTENT_TYPE);
                 exchange.getResponseSender().send(cachedMetrics);
@@ -119,12 +123,13 @@ public class QbtHttpHandler implements HttpHandler {
             String name = torrent.getName();
             String state = torrent.getState();
             String tracker = torrent.getTracker();
+            String mappedTracker = trackerMapper.mapTracker(tracker);
             
             // Set torrent metrics in single pass
             collector.setTorrentDownloadSpeedBytes(name, torrent.getDownloadSpeed());
             collector.setTorrentUploadSpeedBytes(name, torrent.getUploadSpeed());
-            collector.setTorrentDownloadSpeedBytesByTracker(name, tracker, torrent.getDownloadSpeed());
-            collector.setTorrentUploadSpeedBytesByTracker(name, tracker, torrent.getUploadSpeed());
+            collector.setTorrentDownloadSpeedBytesByTracker(name, mappedTracker, torrent.getDownloadSpeed());
+            collector.setTorrentUploadSpeedBytesByTracker(name, mappedTracker, torrent.getUploadSpeed());
             collector.setTorrentTotalDownloadedBytes(name, torrent.getDownloaded());
             collector.setTorrentSessionDownloadedBytes(name, torrent.getDownloadedSession());
             collector.setTorrentTotalUploadedBytes(name, torrent.getUploaded());
@@ -139,12 +144,12 @@ public class QbtHttpHandler implements HttpHandler {
             collector.setTorrentSizeBytes(name, torrent.getSize());
             
             // The torrentInfo metric can be expensive with many labels - make it optional
-            if (COLLECT_TORRENT_INFO) {
-                collector.setTorrentInfo(torrent);
+            if (config.shouldCollectTorrentInfo()) {
+                collector.setTorrentInfo(torrent, mappedTracker);
             }
             
             stateCountMap.merge(state, 1L, Long::sum);
-            trackerCountMap.merge(tracker, 1L, Long::sum);
+            trackerCountMap.merge(mappedTracker, 1L, Long::sum);
         }
 
         // Set aggregate counts

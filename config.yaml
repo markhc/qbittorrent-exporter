@@ -1,0 +1,38 @@
+# qBittorrent Exporter Configuration
+# Configuration file for the qBittorrent Prometheus exporter
+
+# Server configuration
+server:
+  port: 17871
+
+# Cache configuration
+cache:
+  # Cache duration in milliseconds
+  duration_ms: 5000
+
+# Metrics configuration
+metrics:
+  # Whether to collect the expensive torrent_info metric (default: true)
+  # This can also be controlled with -Dqbt.collect.torrent.info=false
+  collect_torrent_info: true
+
+# Performance configuration
+performance:
+  # Whether to make API calls in parallel (default: true)
+  parallel_api_calls: true
+
+# Logging configuration
+logging:
+  # Enable debug logging for configuration (default: false)
+  debug: false
+
+# Tracker name mappings
+trackers:
+  blutopia.cc: BLU
+  beyond-hd.me: BHD
+  tracker.beyond-hd.me: BHD
+  passthepopcorn.me: PTP
+  broadcasthe.net: BTN
+  redacted.ch: RED
+  orpheus.network: OPS
+  animebytes.tv: AB

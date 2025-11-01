@@ -14,7 +14,7 @@ See it on [DockerHub](https://hub.docker.com/r/caseyscarborough/qbittorrent-expo
 
 ## Usage
 
-### docker
+### Docker
 
 ```bash
 docker run \
@@ -22,8 +22,30 @@ docker run \
     -e QBITTORRENT_USERNAME=username \
     -e QBITTORRENT_PASSWORD=password \
     -e QBITTORRENT_BASE_URL=http://localhost:8080 \
+    -e CONFIG_PATH=/config/config.yaml \
+    -v /path/to/config:/config \
     -p 17871:17871 \
     caseyscarborough/qbittorrent-exporter:latest
+```
+
+### Docker Compose
+
+```yaml
+version: '3.8'
+services:
+  qbittorrent-exporter:
+    image: caseyscarborough/qbittorrent-exporter:latest
+    container_name: qbittorrent-exporter
+    environment:
+      - QBITTORRENT_USERNAME=username
+      - QBITTORRENT_PASSWORD=password
+      - QBITTORRENT_BASE_URL=http://qbittorrent:8080
+      - CONFIG_PATH=/config/config.yaml
+    volumes:
+      - ./config:/config
+    ports:
+      - "17871:17871"
+    restart: unless-stopped
 ```
 
 ## Parameters
@@ -37,6 +59,78 @@ docker run \
 |   `-e QBITTORRENT_HOST`   |   The qBittorrent host. Ignored when using `QBITTORRENT_BASE_URL`.   |       `localhost`       |
 |   `-e QBITTORRENT_PORT`   |   The qBittorrent port. Ignored when using `QBITTORRENT_BASE_URL`.   |         `8080`          |
 | `-e QBITTORRENT_PROTOCOL` | The qBittorrent protocol. Ignored when using `QBITTORRENT_BASE_URL`. |         `http`          |
+|   `-e CONFIG_PATH`    |              Path to the YAML configuration file.                    |       `config.yaml`     |
+
+## Configuration
+
+The exporter supports configuration through a YAML file for various settings including tracker name mapping, caching, and metrics collection.
+
+### Configuration File
+
+Create a `config.yaml` file in the same directory as the application, or specify a custom path using:
+
+**Environment Variable (recommended for Docker):**
+```bash
+export CONFIG_PATH=/path/to/config.yaml
+```
+
+**System Property:**
+```bash
+-Dconfig.path=/path/to/config.yaml
+```
+
+**Configuration precedence** (highest to lowest):
+1. System property (`-Dconfig.path`)
+2. Environment variable (`CONFIG_PATH`)
+3. Default path (`config.yaml`)
+
+**Example configuration:**
+
+```yaml
+# qBittorrent Exporter Configuration
+
+# Server configuration
+server:
+  port: 17871
+
+# Cache configuration  
+cache:
+  duration_ms: 5000  # Cache duration in milliseconds
+
+# Metrics configuration
+metrics:
+  collect_torrent_info: true  # Collect expensive torrent_info metric
+
+# Tracker name mappings
+trackers:
+  blutopia.cc: BLU
+  beyond-hd.me: BHD
+  passthepopcorn.me: PTP
+  redacted.ch: RED
+```
+
+### System Properties & Environment Variables
+
+Configuration can be controlled via multiple methods with the following precedence (highest to lowest):
+
+1. **System properties** (highest priority):
+   - `-Dconfig.path=path/to/config.yaml` - Custom path to configuration file
+   - `-Dqbt.collect.torrent.info=false` - Disable the expensive torrentInfo metric
+
+2. **Environment variables** (medium priority):
+   - `CONFIG_PATH=path/to/config.yaml` - Custom path to configuration file
+
+3. **YAML configuration file** (lower priority)
+
+4. **Built-in defaults** (lowest priority)
+
+### Default Values
+
+If no configuration file is found, the exporter will use these defaults:
+- **Cache duration**: 5000ms (5 seconds)
+- **Metrics port**: 17871
+- **Collect torrent info**: true
+- **Default tracker mappings**: Common public trackers (OpenBT, TPB, 1337x, Nyaa, RARBG)
 
 ## Setup
 
