@@ -98,7 +98,11 @@ public class ExporterConfig {
      * Gets cache duration in milliseconds.
      */
     public long getCacheDurationMs() {
-        return get("cache.duration_ms", 5000L);
+        Object value = get("cache.duration_ms", 5000L);
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        return 5000L; // fallback default
     }
     
     /**
@@ -117,7 +121,11 @@ public class ExporterConfig {
      * Gets the metrics port.
      */
     public int getMetricsPort() {
-        return get("server.port", 17871);
+        Object value = get("server.port", 17871);
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        return 17871; // fallback default
     }
     
     /**
